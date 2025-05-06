@@ -1,11 +1,43 @@
 """Utility functions for the Payfort payment gateway."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 import hashlib
 import re
 from typing import Any
 
-from .models import Order
+# from .models import Order
+
+
+@dataclass
+class BasketLine:
+    price_currency: str
+
+@dataclass
+class BasketOwner:
+    email: str
+
+    def get_full_name(self):
+        return f'Mr. John'
+
+@dataclass
+class Basket:
+    id: int
+    owner_id: int
+    owner: BasketOwner
+
+    @property
+    def total_incl_tax(self):
+        return 750
+
+    def all_lines(self):
+        return [
+            BasketLine(
+                price_currency='SAR',
+            )
+        ]
+
+
 
 class GatewayError(Exception):
     pass
@@ -81,26 +113,26 @@ def verify_param(param: Any, param_name: str, required_type: Any):
         )
 
 
-def get_amount(basket: Order) -> int:
+def get_amount(basket: Basket) -> int:
     """
     Return the amount for the given basket in the ISO 4217 currency format for SAR.
 
     @param basket: The basket
     @return: The amount
     """
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     return int(round(basket.total_incl_tax * 100, 0))
 
 
-def get_currency(basket: Order) -> str:
+def get_currency(basket: Basket) -> str:
     """
     Return the currency for the given basket.
 
     @param basket: The basket
     @return: The currency
     """
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     for line in basket.all_lines():
         if line.price_currency and line.price_currency != VALID_CURRENCY:
@@ -109,26 +141,26 @@ def get_currency(basket: Order) -> str:
     return VALID_CURRENCY
 
 
-def get_customer_email(basket: Order) -> str:
+def get_customer_email(basket: Basket) -> str:
     """
     Return the customer email for the given basket.
 
     @param basket: The basket
     @return: The customer email
     """
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     return basket.owner.email
 
 
-def get_customer_name(basket: Order) -> str:
+def get_customer_name(basket: Basket) -> str:
     """
     Return the customer name for the given basket.
 
     @param basket: The basket
     @return: The customer name
     """
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     return sanitize_text(
         basket.owner.get_full_name() or "Name not set",
@@ -151,7 +183,7 @@ def get_language(request: Any) -> str:
     return result if result in ("en", "ar") else "en"
 
 
-def get_merchant_reference(site_id: int, basket: Order) -> str:
+def get_merchant_reference(site_id: int, basket: Basket) -> str:
     """
     Return the merchant reference for the given basket.
 
@@ -160,12 +192,19 @@ def get_merchant_reference(site_id: int, basket: Order) -> str:
     @return: The merchant reference
     """
     verify_param(site_id, "site_id", int)
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     return f"{site_id}-{basket.owner_id}-{basket.id}"
 
 
-def get_order_description(basket: Order) -> str:
+def get_order_description(basket: Basket) -> str:
+    return sanitize_text(
+        'Real-estate brokerage course by SREI',
+        VALID_PATTERNS["order_description"],
+        max_length=MAX_ORDER_DESCRIPTION_LENGTH
+    )
+
+def __get_order_description(basket: Basket) -> str:
     """
     Return the order description for the given basket.
 
@@ -200,7 +239,7 @@ def get_order_description(basket: Order) -> str:
 
         return result or "-"
 
-    verify_param(basket, "basket", Order)
+    verify_param(basket, "basket", Basket)
 
     description = ""
     max_index = len(basket.all_lines()) - 1

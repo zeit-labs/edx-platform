@@ -10,4 +10,5 @@ urlpatterns = [
     path('payment/webhook', views.webhook, name='payments_webhook'),
     path('payment/callback', views.callback, name='payments_callback'),
     path('payment/invoice', views.invoice, name='payments_invoice'),
+    path(r'payment/pay/<slug:provider>', views.payment_form, name='payments_form_payfort'),
 ]

@@ -2,9 +2,11 @@ import logging
 from urllib.parse import urljoin
 
 from django.middleware.csrf import get_token
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 # from ecommerce.extensions.payment.processors import BasePaymentProcessor, HandledProcessorResponse
+from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from . import processor_utils as utils
 
@@ -23,7 +25,7 @@ class PayFort:
     CHECKOUT_TEXT = _("Checkout with credit card")
     NAME = "payfort"
 
-    def __init__(self, site):
+    def __init__(self):
         """Initialize the PayFort processor."""
 
         # self.access_code = self.configuration.get("access_code")
@@ -33,13 +35,12 @@ class PayFort:
         # self.sha_method = self.configuration.get("sha_method")
         # self.ecommerce_url_root = self.configuration.get("ecommerce_url_root")
 
-
-        self.access_code = self.configuration.get("access_code")
-        self.merchant_identifier = self.configuration.get("merchant_identifier")
-        self.request_sha_phrase = self.configuration.get("request_sha_phrase")
-        self.response_sha_phrase = self.configuration.get("response_sha_phrase")
-        self.sha_method = self.configuration.get("sha_method")
-        self.ecommerce_url_root = self.configuration.get("ecommerce_url_root")
+        self.access_code = settings.PAYFORT["access_code"]
+        self.merchant_identifier = settings.PAYFORT["merchant_identifier"]
+        self.request_sha_phrase = settings.PAYFORT["request_sha_phrase"]
+        self.response_sha_phrase = settings.PAYFORT["response_sha_phrase"]
+        self.sha_method = settings.PAYFORT["sha_method"]
+        self.ecommerce_url_root = settings.PAYFORT["ecommerce_url_root"]
 
     def get_transaction_parameters(self, order, request=None, use_client_side_checkout=False, **kwargs):
         """Return the transaction parameters needed for this processor."""
@@ -48,7 +49,7 @@ class PayFort:
             "access_code": self.access_code,
             "merchant_identifier": self.merchant_identifier,
             "language": utils.get_language(request),
-            "merchant_reference": utils.get_merchant_reference(self.site.id, order),
+            "merchant_reference": utils.get_merchant_reference(171, order),
             "amount": utils.get_amount(order),
             "currency": utils.get_currency(order),
             "customer_email": utils.get_customer_email(order),
@@ -57,7 +58,8 @@ class PayFort:
             "customer_name": utils.get_customer_name(order),
             "return_url": urljoin(
                 self.ecommerce_url_root,
-                reverse("payfort:response")
+                'payfort'
+                # reverse("payfort:response")
             ),
         }
 
@@ -68,11 +70,29 @@ class PayFort:
         )
         transaction_parameters.update({
             "signature": signature,
-            "payment_page_url": reverse("payfort:form"),
+            # "payment_page_url": reverse("payfort:form"),
+            "payment_page_url": settings.PAYFORT["feedback_payfort"],
             "csrfmiddlewaretoken": get_token(request),
         })
 
         return transaction_parameters
+
+    def payment_view(self, order, request=None, use_client_side_checkout=False, **kwargs):
+        order = utils.Basket(
+            id=1000,
+            owner_id=2000,
+            owner=utils.BasketOwner(email='omar@zeitlabs.com'),
+        )
+        transaction_parameters = self.get_transaction_parameters(
+            order=order,
+            request=request,
+            use_client_side_checkout=use_client_side_checkout,
+            **kwargs,
+        )
+
+        return render_to_response('payments/processors/payfort.html', {
+            'transaction_parameters': transaction_parameters,
+        })
 
     def handle_processor_response(self, response, basket=None):
         """Handle the payment processor response and record the relevant details."""
