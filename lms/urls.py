@@ -1053,3 +1053,7 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
+
+urlpatterns += [
+    path('', include('lms.djangoapps.payments.urls')),
+]

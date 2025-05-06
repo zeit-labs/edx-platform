@@ -1,0 +1,110 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="pagetitle">${_("Payment {sku}").format(sku=sku)}</%block>
+
+<link rel="stylesheet" href="https://srei.ecommerce.futurex.sa/static/CACHE/css/main.643ebe9aca4b.css" type="text/css">
+
+<div class="basket" dir="rtl">
+   <div class="container">
+      <div id="messages">
+      </div>
+      <div id="content-inner">
+         <form action="." method="post">
+            <input type="hidden" name="csrfmiddlewaretoken"
+               value="O3HnEP8bklleSMmqJV4A0SJ7jZXyfuBfBerJQBIKiT2qnMo2Q5ul4x6uZDi5rcN0">
+            <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden"
+               name="form-INITIAL_FORMS"
+               value="1"
+               id="id_form-INITIAL_FORMS"><input
+               type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS"><input type="hidden"
+               name="form-MAX_NUM_FORMS"
+               value="1000"
+               id="id_form-MAX_NUM_FORMS">
+            <div class="basket-items">
+               <p class="certificate_type">
+                  احصل على شهادة لتوثيق مهاراتك
+               </p>
+               <div class="row">
+                  <div class="col-md-2 col-sm-12 product-image pull-right">
+                     <input type="hidden" name="form-0-id" value="381350" id="id_form-0-id">
+                     <img class="thumbnail"
+                        src="https://dg4ogka6v24tb.cloudfront.net/asset-v1:rega+MAR101+MAR101_2023+type@asset+block@mar101-2023.png"
+                        alt="التسويق العقاري الإلكتروني">
+                  </div>
+                  <div class="col-md-5 col-sm-12 pull-right">
+                     <p class="product-title">التسويق العقاري الإلكتروني - rega
+                        (MAR101_2023)
+                     </p>
+                     <p class="product-description"></p>
+                  </div>
+                  <div class="col-md-5 col-xs-12 product-prices pull-left">
+                     <div class="price ">
+                        &rlm;750.00&nbsp;ر.س.&rlm;
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </form>
+         <div class="total">
+            <div class="row">
+               <div class="use-voucher col-sm-7 col-xs-8 pull-right">
+                  <p id="voucher_form_link">
+                     <a href="#voucher">تطبيق رمز القسيمة</a>
+                  </p>
+                  <div id="voucher_form_container" class="voucher_form">
+                     <form id="voucher_form" action="/basket/vouchers/add/" method="post">
+                        <input type="hidden" name="csrfmiddlewaretoken"
+                           value="O3HnEP8bklleSMmqJV4A0SJ7jZXyfuBfBerJQBIKiT2qnMo2Q5ul4x6uZDi5rcN0">
+                        <div class="code">
+                           <input id="id_code" name="code" type="text">
+                           <button type="submit" id="apply-voucher-button" class="btn btn-default"
+                              data-loading-text="جاري التنفيذ ..." data-track-type="click"
+                              data-track-event="edx.bi.ecommerce.basket.voucher_applied"
+                              data-track-category="voucher-application" data-voucher-code="">
+                           تنفيذ
+                           </button>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+               <div id="basket_totals" class="col-xs-4 pull-left">
+                  الإجمالي:
+                  &rlm;750.00&nbsp;ر.س.&rlm;
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col-sm-12">
+               <div class="pull-left payment-buttons" data-basket-id="221780">
+                 % for method in methods:
+                  <a href="${method.link}" data-track-type="click" data-track-event="edx.bi.ecommerce.basket.payment_selected"
+                     data-track-category="checkout" data-processor-name="hyperpay"
+                     data-track-checkout-type="hosted" class="btn payment-button" id="hyperpay">
+                  ${method.title}
+                  </a>
+                 % endfor
+               </div>
+            </div>
+         </div>
+         <div class="row verification-note">
+            <div class="col-sm-12">
+               <span><i class="fa fa-exclamation-circle"></i></span>
+               <strong>ملاحظة:</strong> لاتمام عملية التسجيل فضلًا حدد خيار إتمام الدفع أو إتمام الدفع عن طريق
+               PayPal
+            </div>
+         </div>
+         <div class="row help">
+            <div class="col-sm-12">
+               <p><strong>لديك أسئلة؟</strong></p>
+               <a href="">يرجى الاطلاع على الأسئلة الشائعة لاستعراض الأسئلة المتعلقة بالشهادات.</a>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

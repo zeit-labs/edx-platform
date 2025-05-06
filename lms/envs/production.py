@@ -1018,6 +1018,8 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE
 COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
                                                 COMPLETION_BY_VIEWING_DELAY_MS)
 
+INSTALLED_APPS += ['lms.djangoapps.payments']
+
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
 LOGO_URL_PNG = ENV_TOKENS.get('LOGO_URL_PNG', LOGO_URL_PNG)

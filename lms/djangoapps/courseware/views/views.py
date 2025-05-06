@@ -812,10 +812,10 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
         ecomm_service = EcommerceService()
-        ecommerce_checkout = ecomm_service.is_enabled(request.user)
+        ecommerce_checkout =  True ##  ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
         ecommerce_bulk_checkout_link = ''
-        single_paid_mode = None
+        single_paid_mode = ''
         if ecommerce_checkout:
             if len(modes) == 1 and list(modes.values())[0].min_price:
                 single_paid_mode = list(modes.values())[0]
@@ -824,7 +824,8 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
                 single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
 
             if single_paid_mode and single_paid_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+                # ecommerce_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.sku)
+                ecommerce_checkout_link = f'/basket/add?sku={single_paid_mode.sku}'
             if single_paid_mode and single_paid_mode.bulk_sku:
                 ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
